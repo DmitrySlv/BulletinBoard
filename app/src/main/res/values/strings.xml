@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">BulletinBoard</string>
+    <!-- Menu Drawer Strings -->
+    <string name="add_cat1">Объявления</string>
+    <string name="add_my_ads">Мои объявления</string>
+    <string name="add_my_favourite">Избранные</string>
+    <string name="add_car">Машины</string>
+    <string name="add_pc">Компьютеры</string>
+    <string name="add_smartphone">Смартфоны</string>
+    <string name="add_dm">Бытовая техника</string>
+    <string name="add_cat2">Аккаунт</string>
+    <string name="ac_sign_up">Регистрация</string>
+    <string name="ac_sign_in">Вход</string>
+    <string name="ac_sign_out">Выход</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="not_reg">Войдите или зарегистрируйтесь!</string>
+    <!-- Sign Dialog -->
+    <string name="email_hint">Email</string>
+    <string name="dialog_reset_email_message">Для восстановления пароля укажите ваш Email адрес</string>
+    <string name="email_reset_password_was_send">Пароль был отправлен!</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_up_action">Зарегистрироваться</string>
+    <string name="sign_in_action">Войти</string>
+    <string name="forget_password">Забыли пароль?</string>
+    <string name="sign_up_error">Неудалось зарегестрироваться</string>
+    <string name="send_verification_error">Неудалось отправить email для подтверждения</string>
+    <string name="send_verification_done">На вашу почту была отправлена ссылка для подтверждения
+        вашего аккаунта, пожалуйста подтвердите ваш аккаунт!</string>
+    <string name="sign_in_error">Неудалось войти</string>
+    <!-- Sign Dialog -->
+    <string name="link_done">Email успешно подключен к Google аккаунту</string>
+    <string name="enter_to_g">У вас уже есть аккаунт с таким Email адресом. Войдите с этим Email адресом</string>
+    <!-- EditAdsAct Dialog -->
+    <string name="no_result">Нет результата</string>
+    <!-- Edit Activity -->
+    <string name="select_country">*Выберите страну</string>
+    <string name="select_city">*Выберите город</string>
+    <string name="no_country_selected">No country selected</string>
+
+</resources>
