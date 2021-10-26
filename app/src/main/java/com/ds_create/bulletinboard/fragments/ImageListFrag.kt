@@ -3,19 +3,15 @@ package com.ds_create.bulletinboard.fragments
 import android.app.Activity
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.databinding.ListImageFragBinding
 import com.ds_create.bulletinboard.dialoghelper.ProgressDialog
@@ -28,13 +24,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,private val newList: ArrayList<String>?): BaseSelectImageFrag(), AdapterCallback {
+class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,private val newList: ArrayList<String>?): BaseAdsFrag(), AdapterCallback {
 
     val adapter = SelectImageRvAdapter(this)
     val dragCallback = ItemTouchMoveCallback(adapter)
     val touchHelper = ItemTouchHelper(dragCallback)
     private var job: Job? = null
     private var addImageItem: MenuItem? = null
+    lateinit var binding: ListImageFragBinding
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = ListImageFragBinding.inflate(layoutInflater)
+        adView = binding.adView
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,6 +68,11 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
         job?.cancel()
     }
 
+    override fun onClose() {
+        super.onClose()
+        activity?.supportFragmentManager?.beginTransaction()?.remove(this@ImageListFrag)?.commit()
+    }
+
     private fun resizeSelectedImages(newList: ArrayList<String>, needClear: Boolean) {
 
         job = CoroutineScope(Dispatchers.Main).launch {
@@ -85,7 +93,7 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
             addImageItem = tb.menu.findItem(R.id.id_add_image)
 
             tb.setNavigationOnClickListener {
-                activity?.supportFragmentManager?.beginTransaction()?.remove(this@ImageListFrag)?.commit()
+                showInterAd()
             }
 
             deleteItem.setOnMenuItemClickListener {
