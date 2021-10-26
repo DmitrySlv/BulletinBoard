@@ -28,28 +28,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,private val newList: ArrayList<String>?): Fragment(), AdapterCallback {
+class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,private val newList: ArrayList<String>?): BaseSelectImageFrag(), AdapterCallback {
 
-    lateinit var rootElement: ListImageFragBinding
     val adapter = SelectImageRvAdapter(this)
     val dragCallback = ItemTouchMoveCallback(adapter)
     val touchHelper = ItemTouchHelper(dragCallback)
     private var job: Job? = null
     private var addImageItem: MenuItem? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        rootElement = ListImageFragBinding.inflate(inflater)
-        return rootElement.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setUpToolbar()
-        touchHelper.attachToRecyclerView(rootElement.rcViewSelectImage)
-        rootElement.rcViewSelectImage.layoutManager = LinearLayoutManager(activity)
-        rootElement.rcViewSelectImage.adapter = adapter
-        if (newList != null) resizeSelectedImages(newList, true)
+
+        binding.apply {
+
+            touchHelper.attachToRecyclerView(rcViewSelectImage)
+            rcViewSelectImage.layoutManager = LinearLayoutManager(activity)
+            rcViewSelectImage.adapter = adapter
+            if (newList != null) resizeSelectedImages(newList, true)
+
+        }
+
     }
 
     override fun onItemDelete() {
@@ -79,24 +78,32 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
     }
 
     private fun setUpToolbar() {
-        rootElement.tb.inflateMenu(R.menu.menu_choose_image)
-        val deleteItem = rootElement.tb.menu.findItem(R.id.id_delete_image)
-        addImageItem = rootElement.tb.menu.findItem(R.id.id_add_image)
+        binding.apply {
 
-        rootElement.tb.setNavigationOnClickListener {
-            activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
-        }
+            tb.inflateMenu(R.menu.menu_choose_image)
+            val deleteItem = tb.menu.findItem(R.id.id_delete_image)
+            addImageItem = tb.menu.findItem(R.id.id_add_image)
 
-        deleteItem.setOnMenuItemClickListener {
-            adapter.updateAdapter(ArrayList(), true)
-            addImageItem?.isVisible = true
-            true
-        }
+            tb.setNavigationOnClickListener {
+                activity?.supportFragmentManager?.beginTransaction()?.remove(this@ImageListFrag)?.commit()
+            }
 
-        addImageItem?.setOnMenuItemClickListener {
-            val imageCount = ImagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
-            ImagePicker.getImages(activity as AppCompatActivity, imageCount, ImagePicker.REQUEST_CODE_GET_IMAGES)
-            true
+            deleteItem.setOnMenuItemClickListener {
+                adapter.updateAdapter(ArrayList(), true)
+                addImageItem?.isVisible = true
+                true
+            }
+
+            addImageItem?.setOnMenuItemClickListener {
+                val imageCount = ImagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
+                ImagePicker.getImages(
+                    activity as AppCompatActivity,
+                    imageCount,
+                    ImagePicker.REQUEST_CODE_GET_IMAGES
+                )
+                true
+            }
+
         }
     }
 
@@ -106,7 +113,7 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
 
     fun setSingleImage(uri: String, pos: Int) {
 
-        val pBar = rootElement.rcViewSelectImage[pos].findViewById<ProgressBar>(R.id.pBar)
+        val pBar = binding.rcViewSelectImage[pos].findViewById<ProgressBar>(R.id.pBar)
         job = CoroutineScope(Dispatchers.Main).launch {
             pBar.visibility = View.VISIBLE
             val bitmapList = ImageManager.imageResize(listOf(uri))
