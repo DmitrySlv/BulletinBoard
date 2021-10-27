@@ -88,6 +88,11 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     }
 }
 
+    fun onClickSelectCat(view: View) {
+            val listCity = resources.getStringArray(R.array.category).toMutableList() as ArrayList
+            dialog.showSpinnerDialog(this, listCity, rootElement.tvCat)
+    }
+
     fun onClickGetImages(view: View) {
 
         if (imageAdapter.mainArray.size == 0) {
