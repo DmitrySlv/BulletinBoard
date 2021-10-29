@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.adapters.ImageAdapter
+import com.ds_create.bulletinboard.data.Ad
 import com.ds_create.bulletinboard.database.DbManager
 import com.ds_create.bulletinboard.databinding.ActivityEditAdsBinding
 import com.ds_create.bulletinboard.dialogs.DialogSpinnerHelper
@@ -29,6 +30,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     private val dialog = DialogSpinnerHelper()
     lateinit var imageAdapter: ImageAdapter
     var editImagePos = 0
+    private val dbManager = DbManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +56,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     ImagePicker.getImages(this, 3, ImagePicker.REQUEST_CODE_GET_IMAGES)
                 } else {
-                    Toast.makeText(this,
+                    Toast.makeText(
+                        this,
                         "Approve permissions to open Pix ImagePicker",
                         Toast.LENGTH_LONG
                     ).show()
@@ -82,16 +85,16 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     fun onClickSelectCity(view: View) {
         val selectedCountry = rootElement.tvCountry.text.toString()
         if (selectedCountry != getString(R.string.select_country)) {
-        val listCity = CityHelper.getAllCities(selectedCountry, this)
-        dialog.showSpinnerDialog(this, listCity, rootElement.tvCity)
-    } else {
-        Toast.makeText(this, getString(R.string.no_country_selected), Toast.LENGTH_LONG).show()
+            val listCity = CityHelper.getAllCities(selectedCountry, this)
+            dialog.showSpinnerDialog(this, listCity, rootElement.tvCity)
+        } else {
+            Toast.makeText(this, getString(R.string.no_country_selected), Toast.LENGTH_LONG).show()
+        }
     }
-}
 
     fun onClickSelectCat(view: View) {
-            val listCity = resources.getStringArray(R.array.category).toMutableList() as ArrayList
-            dialog.showSpinnerDialog(this, listCity, rootElement.tvCat)
+        val listCity = resources.getStringArray(R.array.category).toMutableList() as ArrayList
+        dialog.showSpinnerDialog(this, listCity, rootElement.tvCat)
     }
 
     fun onClickGetImages(view: View) {
@@ -105,8 +108,24 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     }
 
     fun onClickPublish(view: View) {
-        val dbManager = DbManager()
-        dbManager.publishAd()
+        dbManager.publishAd(fillAd())
+    }
+
+    private fun fillAd(): Ad {
+        val ad: Ad
+        rootElement.apply {
+            ad = Ad(
+                tvCountry.text.toString(),
+                tvCity.text.toString(),
+                editTel.text.toString(),
+                edIndex.text.toString(),
+                checkBoxWithSend.isChecked.toString(),
+                tvCat.text.toString(),
+                edPrice.text.toString(),
+                edDescription.text.toString(),
+                dbManager.db.push().key)
+        }
+        return ad
     }
 
     override fun onFragClose(list: ArrayList<Bitmap>) {
