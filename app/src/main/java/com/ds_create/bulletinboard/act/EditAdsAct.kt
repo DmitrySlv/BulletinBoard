@@ -29,8 +29,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     lateinit var rootElement: ActivityEditAdsBinding
     private val dialog = DialogSpinnerHelper()
     lateinit var imageAdapter: ImageAdapter
-    var editImagePos = 0
     private val dbManager = DbManager()
+    var editImagePos = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,7 +123,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 tvCat.text.toString(),
                 edPrice.text.toString(),
                 edDescription.text.toString(),
-                dbManager.db.push().key)
+                dbManager.db.push().key
+            )
         }
         return ad
     }
