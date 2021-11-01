@@ -294,6 +294,27 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/title"
+                        android:textColor="@color/green_main"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:ems="10"
+                        android:hint="@string/title_hint"
+                        android:inputType="textPersonName"
+                        android:padding="10dp"
+                        android:textColorHint="@color/gray_dark" />
+
+                    <TextView
                         android:id="@+id/tvTitlePrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
