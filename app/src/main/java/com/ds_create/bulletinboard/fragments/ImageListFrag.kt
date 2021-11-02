@@ -8,11 +8,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ds_create.bulletinboard.R
+import com.ds_create.bulletinboard.act.EditAdsAct
 import com.ds_create.bulletinboard.databinding.ListImageFragBinding
 import com.ds_create.bulletinboard.dialoghelper.ProgressDialog
 import com.ds_create.bulletinboard.utils.AdapterCallback
@@ -103,12 +103,8 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
             }
 
             addImageItem?.setOnMenuItemClickListener {
-                val imageCount = ImagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
-                ImagePicker.getImages(
-                    activity as AppCompatActivity,
-                    imageCount,
-                    ImagePicker.REQUEST_CODE_GET_IMAGES
-                )
+              val imageCount = ImagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
+                ImagePicker.launcher(activity as EditAdsAct, (activity as EditAdsAct).launcherMultiSelectImage, imageCount)
                 true
             }
 
