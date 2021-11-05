@@ -44,19 +44,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initRecyclerView()
         initViewModel()
         firebaseViewModel.loadAllAds()
+        bottomMenuOnClick()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.id_new_ads) {
-            val i = Intent(this, EditAdsAct::class.java)
-            startActivity(i)
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return super.onCreateOptionsMenu(menu)
+    override fun onResume() {
+        super.onResume()
+        rootElement.mainContent.bNavView.selectedItemId = R.id.id_home
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -97,6 +90,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
         rootElement.navView.setNavigationItemSelectedListener(this)
         tvAccount = rootElement.navView.getHeaderView(0).findViewById(R.id.tvAccountEmail)
+    }
+
+    private fun bottomMenuOnClick() = with(rootElement){
+        mainContent.bNavView.setOnNavigationItemSelectedListener { item ->
+            when(item.itemId) {
+                R.id.id_new_ad -> {
+                    val i = Intent(this@MainActivity, EditAdsAct::class.java)
+                    startActivity(i)
+                }
+                R.id.id_my_ads -> {
+                    Toast.makeText(this@MainActivity, "myAds", Toast.LENGTH_LONG).show()
+                }
+                R.id.id_favs -> {
+                    Toast.makeText(this@MainActivity, "Favs", Toast.LENGTH_LONG).show()
+                }
+                R.id.id_home -> {
+                    Toast.makeText(this@MainActivity, "Home", Toast.LENGTH_LONG).show()
+                }
+            }
+            true
+        }
     }
 
     private fun initRecyclerView() {

@@ -27,10 +27,10 @@ class DbManager {
                 val adArray = ArrayList<Ad>()
                 for (item in snapshot.children) {
                     val ad = item.children.iterator().next().child("ad").getValue(Ad::class.java)
-                    if (ad != null) adArray.add(ad)
-                //                    ad?.let {
-//                        adArray.add(it)
-//                    }
+//                    if (ad != null) adArray.add(ad)
+                                    ad?.let {
+                        adArray.add(it)
+                    }
                 }
                 readDataCallback?.readData(adArray)
             }
