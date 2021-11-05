@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ds_create.bulletinboard.data.Ad
+import com.ds_create.bulletinboard.model.Ad
 import com.ds_create.bulletinboard.databinding.AdListItemBinding
 import com.google.firebase.auth.FirebaseAuth
 

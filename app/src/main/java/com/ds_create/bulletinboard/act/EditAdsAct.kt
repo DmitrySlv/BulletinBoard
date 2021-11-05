@@ -11,8 +11,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.adapters.ImageAdapter
-import com.ds_create.bulletinboard.data.Ad
-import com.ds_create.bulletinboard.database.DbManager
+import com.ds_create.bulletinboard.model.Ad
+import com.ds_create.bulletinboard.model.DbManager
 import com.ds_create.bulletinboard.databinding.ActivityEditAdsBinding
 import com.ds_create.bulletinboard.dialogs.DialogSpinnerHelper
 import com.ds_create.bulletinboard.fragments.FragmentCloseInterface
@@ -27,7 +27,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     lateinit var rootElement: ActivityEditAdsBinding
     private val dialog = DialogSpinnerHelper()
     lateinit var imageAdapter: ImageAdapter
-    private val dbManager = DbManager(null)
+    private val dbManager = DbManager()
     var editImagePos = 0
     var launcherMultiSelectImage: ActivityResultLauncher<Intent>? = null
     var launcherSingleSelectImage: ActivityResultLauncher<Intent>? = null
