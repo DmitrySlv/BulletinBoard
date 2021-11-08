@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import com.ds_create.bulletinboard.MainActivity
 import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.adapters.ImageAdapter
 import com.ds_create.bulletinboard.model.Ad
@@ -37,6 +38,29 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         rootElement = ActivityEditAdsBinding.inflate(layoutInflater)
         setContentView(rootElement.root)
         init()
+        checkEditState()
+    }
+
+    private fun checkEditState() {
+        if (isEditState()) {
+            fillViews(intent.getSerializableExtra(MainActivity.ADS_DATA) as Ad)
+        }
+    }
+
+    private fun isEditState(): Boolean {
+        return intent.getBooleanExtra(MainActivity.EDIT_STATE, false)
+    }
+
+    private fun fillViews(ad: Ad) = with(rootElement) {
+        tvCountry.text = ad.country
+        tvCity.text = ad.city
+        editTel.setText(ad.tel)
+        edIndex.setText(ad.index)
+        checkBoxWithSend.isChecked = ad.withSend.toBoolean()
+        tvCat.text = ad.category
+        edTitle.setText(ad.title)
+        edPrice.setText(ad.price)
+        edDescription.setText(ad.description)
     }
 
 

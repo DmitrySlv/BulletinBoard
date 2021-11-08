@@ -1,20 +1,23 @@
 package com.ds_create.bulletinboard.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ds_create.bulletinboard.MainActivity
+import com.ds_create.bulletinboard.act.EditAdsAct
 import com.ds_create.bulletinboard.model.Ad
 import com.ds_create.bulletinboard.databinding.AdListItemBinding
 import com.google.firebase.auth.FirebaseAuth
 
-class AdsRcAdapter(val auth: FirebaseAuth): RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
+class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
 
     val adArray = ArrayList<Ad>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdHolder {
         val binding = AdListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AdHolder(binding, auth)
+        return AdHolder(binding, act)
     }
 
     override fun onBindViewHolder(holder: AdHolder, position: Int) {
@@ -31,19 +34,29 @@ class AdsRcAdapter(val auth: FirebaseAuth): RecyclerView.Adapter<AdsRcAdapter.Ad
         notifyDataSetChanged()
     }
 
-    class AdHolder(val binding: AdListItemBinding, val auth: FirebaseAuth) : RecyclerView.ViewHolder(binding.root) {
+    class AdHolder(val binding: AdListItemBinding, val act: MainActivity) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun setData(ad: Ad) {
-            binding.apply {
-                tvDescription.text = ad.description
-                tvPrice.text = ad.price
-                tvTitle.text = ad.title
-            }
+        fun setData(ad: Ad) = with(binding) {
+            tvDescription.text = ad.description
+            tvPrice.text = ad.price
+            tvTitle.text = ad.title
             showEditPanel(isOwner(ad))
+            ibEditAd.setOnClickListener(onClickEdit(ad))
+        }
+
+        private fun onClickEdit(ad: Ad): View.OnClickListener {
+            return View.OnClickListener {
+                val editIntent = Intent(act, EditAdsAct::class.java).apply {
+                    putExtra(MainActivity.EDIT_STATE, true)
+                    putExtra(MainActivity.ADS_DATA, ad)
+                }
+                act.startActivity(editIntent)
+            }
         }
 
         private fun isOwner(ad: Ad): Boolean {
-            return ad.uid == auth.uid
+            return ad.uid == act.mAuth.uid
         }
 
         private fun showEditPanel(isOwner: Boolean) {
