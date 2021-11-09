@@ -32,6 +32,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     var editImagePos = 0
     var launcherMultiSelectImage: ActivityResultLauncher<Intent>? = null
     var launcherSingleSelectImage: ActivityResultLauncher<Intent>? = null
+    private var isEditState = false
+    private var ad: Ad? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,11 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
     private fun checkEditState() {
         if (isEditState()) {
-            fillViews(intent.getSerializableExtra(MainActivity.ADS_DATA) as Ad)
+            isEditState = true
+            ad = intent.getSerializableExtra(MainActivity.ADS_DATA) as Ad
+            ad?.let {
+                fillViews(it)
+            }
         }
     }
 
@@ -130,7 +136,20 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     }
 
     fun onClickPublish(view: View) {
-        dbManager.publishAd(fillAd())
+        val adTemp = fillAd()
+        if (isEditState) {
+            dbManager.publishAd(adTemp.copy(key = ad?.key), onPublishFinish())
+        } else {
+            dbManager.publishAd(adTemp, onPublishFinish())
+        }
+    }
+
+    private fun onPublishFinish(): DbManager.FinishWorkListener {
+        return object: DbManager.FinishWorkListener {
+            override fun onFinish() {
+                finish()
+            }
+        }
     }
 
     private fun fillAd(): Ad {
@@ -145,10 +164,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 tvCat.text.toString(),
                 edTitle.text.toString(),
                 edPrice.text.toString(),
-                edDescription.text.toString(),
-                dbManager.db.push().key,
-                dbManager.auth.uid
-            )
+                edDescription.text.toString(), dbManager.db.push().key, dbManager.auth.uid)
         }
         return ad
     }
