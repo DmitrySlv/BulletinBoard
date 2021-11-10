@@ -36,6 +36,13 @@ class DbManager {
         readDataFromDb(query, readDataCallback)
     }
 
+    fun deleteAd(ad: Ad, listener: FinishWorkListener) {
+        if (ad.key == null || ad.uid == null) return
+        db.child(ad.key).child(ad.uid).removeValue().addOnCompleteListener {
+            if (it.isSuccessful) listener.onFinish()
+        }
+    }
+
     private fun readDataFromDb(query: Query, readDataCallback: ReadDataCallback?) {
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
