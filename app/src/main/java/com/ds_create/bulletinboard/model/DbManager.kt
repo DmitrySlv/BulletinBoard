@@ -1,6 +1,7 @@
 package com.ds_create.bulletinboard.model
 
 
+import android.util.Log
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -100,6 +101,13 @@ class DbManager {
                         if (ad == null) ad = it.child(AD_NODE).getValue(Ad::class.java)
                     }
                     val infoItem = item.child(INFO_NODE).getValue(InfoItem::class.java)
+
+                    val favCounter = item.child(FAVS_NODE).childrenCount
+                    val isFav = auth.uid?.let {
+                        item.child(FAVS_NODE).child(it).getValue(String::class.java)
+                    }
+                    ad?.isFav = isFav != null
+                    ad?.favCounter = favCounter.toString()
 
                     ad?.viewsCounter = infoItem?.viewsCounter ?: "0"
                     ad?.emailCounter = infoItem?.emailsCounter ?: "0"
