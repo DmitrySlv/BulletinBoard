@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ds_create.bulletinboard.accounthelper.AccountHelper
 import com.ds_create.bulletinboard.act.EditAdsAct
 import com.ds_create.bulletinboard.adapters.AdsRcAdapter
 import com.ds_create.bulletinboard.databinding.ActivityMainBinding
@@ -129,19 +130,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (item.itemId) {
 
             R.id.id_my_ads -> {
-                Toast.makeText(this, "Pressed id_my_ads",Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Pressed id_my_ads", Toast.LENGTH_LONG).show()
             }
             R.id.id_car -> {
-                Toast.makeText(this, "Pressed id_car",Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Pressed id_car", Toast.LENGTH_LONG).show()
             }
             R.id.id_pc -> {
-                Toast.makeText(this, "Pressed id_pc",Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Pressed id_pc", Toast.LENGTH_LONG).show()
             }
             R.id.id_smart -> {
-                Toast.makeText(this, "Pressed id_smart",Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Pressed id_smart", Toast.LENGTH_LONG).show()
             }
             R.id.id_dm -> {
-                Toast.makeText(this, "Pressed id_dm",Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Pressed id_dm", Toast.LENGTH_LONG).show()
             }
             R.id.id_sign_up -> {
                 dialogHelper.createSignDialog(DialogConst.SIGN_UP_STATE)
@@ -150,23 +151,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dialogHelper.createSignDialog(DialogConst.SIGN_IN_STATE)
             }
             R.id.id_sign_out -> {
+                if (mAuth.currentUser?.isAnonymous == true) {
+                    rootElement.drawerLayout.closeDrawer(GravityCompat.START)
+                    return true
+                }
                 uiUpdate(null)
                 mAuth.signOut()
                 dialogHelper.accHelper.signOutG()
             }
         }
-
         rootElement.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
     fun uiUpdate(user:FirebaseUser?) {
 
-        tvAccount.text = if (user == null) {
-            resources.getString(R.string.not_reg)
-        } else {
-            user.email
-        }
+       if (user == null) {
+           dialogHelper.accHelper.signInAnonymously(object: AccountHelper.Listener {
+               override fun onComplete() {
+                   tvAccount.setText(R.string.guest)
+               }
+           })
+        } else if (user.isAnonymous) {
+            tvAccount.setText(R.string.guest)
+        } else if (!user.isAnonymous) {
+            tvAccount.text = user.email
+       }
     }
 
     companion object {
