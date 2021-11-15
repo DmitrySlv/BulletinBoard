@@ -1,9 +1,14 @@
 <resources>
     <string name="app_name">BulletinBoard</string>
+    <string name="ad_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_inter_id">ca-app-pub-3940256099942544/1033173712</string>
+    <!-- Main Activity -->
+    <string name="guest">Гость</string>
     <!-- Menu Drawer Strings -->
     <string name="add_cat1">Объявления</string>
     <string name="add_my_ads">Мои объявления</string>
     <string name="add_my_favourite">Избранные</string>
+    <string name="def">Разное</string>
     <string name="add_car">Машины</string>
     <string name="add_pc">Компьютеры</string>
     <string name="add_smartphone">Смартфоны</string>
@@ -37,5 +42,23 @@
     <string name="select_country">*Выберите страну</string>
     <string name="select_city">*Выберите город</string>
     <string name="no_country_selected">No country selected</string>
+    <string name="country">Страна</string>
+    <string name="city">Город</string>
+    <string name="index">*Индекс</string>
+    <string name="tel">Телефон</string>
+    <string name="tel_number">*Номер телефона</string>
+    <string name="category">Категория</string>
+    <string name="title">Заголовок</string>
+    <string name="title_hint">*Название объявления</string>
+    <string name="select_category">*Выберите категорию</string>
+    <string name="price">Цена</string>
+    <string name="price_hint">*Укажите цену</string>
+    <string name="description">Описание</string>
+    <string name="description_hint">*Описание</string>
+    <string name="with_send">С отправкой</string>
+    <string name="send">Отправка</string>
+    <string name="publish">Опубликовать</string>
+    <!-- Ad List Item -->
+    <string name="price_desc">Цена:</string>
 
 </resources>

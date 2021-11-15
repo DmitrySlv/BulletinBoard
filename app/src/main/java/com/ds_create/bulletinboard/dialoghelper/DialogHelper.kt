@@ -9,8 +9,8 @@ import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.accounthelper.AccountHelper
 import com.ds_create.bulletinboard.databinding.SignDialogBinding
 
-class DialogHelper(act:MainActivity) {
-    private val act = act
+class DialogHelper(val act:MainActivity) {
+
     val accHelper = AccountHelper(act)
 
     fun createSignDialog(index:Int) {
