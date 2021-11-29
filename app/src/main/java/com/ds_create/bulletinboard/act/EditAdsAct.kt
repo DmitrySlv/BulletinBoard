@@ -2,8 +2,8 @@ package com.ds_create.bulletinboard.act
 
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -29,8 +29,6 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     lateinit var imageAdapter: ImageAdapter
     private val dbManager = DbManager()
     var editImagePos = 0
-    var launcherMultiSelectImage: ActivityResultLauncher<Intent>? = null
-    var launcherSingleSelectImage: ActivityResultLauncher<Intent>? = null
     private var isEditState = false
     private var ad: Ad? = null
 
@@ -72,8 +70,6 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     private fun init() {
         imageAdapter = ImageAdapter()
         rootElement.vpImages.adapter = imageAdapter
-        launcherMultiSelectImage = ImagePicker.getLauncherForMultiSelectImages(this)
-        launcherSingleSelectImage = ImagePicker.getLauncherForSingleImage(this)
     }
 
     //OnClicks
@@ -103,7 +99,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     fun onClickGetImages(view: View) {
 
         if (imageAdapter.mainArray.size == 0) {
-            ImagePicker.launcher(this, launcherMultiSelectImage, 3)
+            ImagePicker.launcher(this,  3)
         } else {
             openChooseImageFrag(null)
             chooseImageFrag?.updateAdapterFromEdit(imageAdapter.mainArray)
@@ -150,7 +146,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         chooseImageFrag = null
     }
 
-    fun openChooseImageFrag(newList: ArrayList<String>?) {
+    fun openChooseImageFrag(newList: ArrayList<Uri>?) {
 
         chooseImageFrag = ImageListFrag(this, newList)
         rootElement.scrollViewMain.visibility = View.GONE
