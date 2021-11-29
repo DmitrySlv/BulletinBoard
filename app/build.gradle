@@ -12,7 +12,7 @@ android {
             resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
         }
         applicationId "com.ds_create.bulletinboard"
-        minSdk 19
+        minSdk 21
         targetSdk 30
         versionCode 1
         versionName "1.0"
@@ -54,7 +54,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0-native-mt'
-    implementation  'com.fxn769:pix:1.5.6'
+    implementation  'io.ak1.pix:piximagepicker:1.6.2'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.gms:play-services-ads:20.4.0'
     testImplementation 'junit:junit:4.13.2'

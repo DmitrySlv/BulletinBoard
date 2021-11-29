@@ -20,7 +20,6 @@ import com.ds_create.bulletinboard.fragments.FragmentCloseInterface
 import com.ds_create.bulletinboard.fragments.ImageListFrag
 import com.ds_create.bulletinboard.utils.CityHelper
 import com.ds_create.bulletinboard.utils.ImagePicker
-import com.fxn.utility.PermUtil
 
 class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
@@ -67,30 +66,6 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         edTitle.setText(ad.title)
         edPrice.setText(ad.price)
         edDescription.setText(ad.description)
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS -> {
-
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                   // ImagePicker.getImages(this, 3, ImagePicker.REQUEST_CODE_GET_IMAGES)
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Approve permissions to open Pix ImagePicker",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                return
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
 
