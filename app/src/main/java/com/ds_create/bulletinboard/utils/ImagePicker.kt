@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.act.EditAdsAct
 import io.ak1.pix.helpers.PixEventCallback
@@ -36,7 +37,7 @@ object ImagePicker {
         return options
     }
 
-    fun launcher(edAct: EditAdsAct, imageCounter: Int) {
+    fun getMultiImages(edAct: EditAdsAct, imageCounter: Int) {
         edAct.addPixToActivity(R.id.place_holder, getOptions(imageCounter)) { result ->
             when (result.status) {
                 PixEventCallback.Status.SUCCESS -> {
@@ -48,6 +49,24 @@ object ImagePicker {
         }
     }
 
+    fun getSingleImage(edAct: EditAdsAct) {
+        val f = edAct.chooseImageFrag
+        edAct.addPixToActivity(R.id.place_holder, getOptions(1)) { result ->
+            when (result.status) {
+                PixEventCallback.Status.SUCCESS -> {
+                    edAct.chooseImageFrag = f
+                    openChooseImageFrag(edAct, f!!)
+                    singleImage(edAct, result.data[0])
+                }
+                //  PixEventCallback.Status.BACK_PRESSED -> // back pressed called
+            }
+        }
+    }
+
+    private fun openChooseImageFrag(edAct: EditAdsAct, f: Fragment) {
+        edAct.supportFragmentManager.beginTransaction().replace(R.id.place_holder, f).commit()
+    }
+
     private fun closePixFrag(edAct: EditAdsAct) {
         val fList = edAct.supportFragmentManager.fragments
         fList.forEach{
@@ -57,30 +76,22 @@ object ImagePicker {
 
 
     fun getMultiSelectImages(edAct: EditAdsAct, uris: List<Uri>) {
-
-                    if (uris.size > 1 && edAct.chooseImageFrag == null) {
-                        edAct.openChooseImageFrag(uris as ArrayList<Uri>)
-                    } else if (edAct.chooseImageFrag != null) {
-                        edAct.chooseImageFrag?.updateAdapter(uris as ArrayList<Uri>)
-                    } else if (uris.size == 1 && edAct.chooseImageFrag == null) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            edAct.rootElement.pBarLoad.visibility = View.VISIBLE
-                            val bitmapArray = ImageManager.imageResize(uris as ArrayList<Uri>, edAct) as ArrayList<Bitmap>
-                            edAct.rootElement.pBarLoad.visibility = View.GONE
-                            edAct.imageAdapter.update(bitmapArray)
-                        }
+        if (uris.size > 1 && edAct.chooseImageFrag == null) {
+            edAct.openChooseImageFrag(uris as ArrayList<Uri>)
+        } else if (edAct.chooseImageFrag != null) {
+            edAct.chooseImageFrag?.updateAdapter(uris as ArrayList<Uri>)
+        } else if (uris.size == 1 && edAct.chooseImageFrag == null) {
+            CoroutineScope(Dispatchers.Main).launch {
+                edAct.rootElement.pBarLoad.visibility = View.VISIBLE
+                val bitmapArray =
+                    ImageManager.imageResize(uris as ArrayList<Uri>, edAct) as ArrayList<Bitmap>
+                edAct.rootElement.pBarLoad.visibility = View.GONE
+                edAct.imageAdapter.update(bitmapArray)
+            }
         }
     }
 
-    fun getLauncherForSingleImage(edAct: EditAdsAct): ActivityResultLauncher<Intent> {
-        return edAct.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                result: ActivityResult ->
-//            if (result.resultCode == AppCompatActivity.RESULT_OK) {
-//                if (result.data != null) {
-//                    val uris = result.data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
-//                    edAct.chooseImageFrag?.setSingleImage(uris?.get(0)!!, edAct.editImagePos)
-//                }
-//            }
-        }
+    private fun singleImage(edAct: EditAdsAct, uri: Uri) {
+                    edAct.chooseImageFrag?.setSingleImage(uri, edAct.editImagePos)
     }
 }

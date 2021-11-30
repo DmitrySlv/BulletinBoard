@@ -25,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,private val newList: ArrayList<Uri>?): BaseAdsFrag(), AdapterCallback {
+class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface): BaseAdsFrag(), AdapterCallback {
 
     val adapter = SelectImageRvAdapter(this)
     val dragCallback = ItemTouchMoveCallback(adapter)
@@ -45,14 +45,10 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
         setUpToolbar()
 
         binding.apply {
-
             touchHelper.attachToRecyclerView(rcViewSelectImage)
             rcViewSelectImage.layoutManager = LinearLayoutManager(activity)
             rcViewSelectImage.adapter = adapter
-            if (newList != null) resizeSelectedImages(newList, true)
-
         }
-
     }
 
     override fun onItemDelete() {
@@ -74,11 +70,11 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
         activity?.supportFragmentManager?.beginTransaction()?.remove(this@ImageListFrag)?.commit()
     }
 
-    private fun resizeSelectedImages(newList: ArrayList<Uri>, needClear: Boolean) {
+    fun resizeSelectedImages(newList: ArrayList<Uri>, needClear: Boolean, activity: Activity) {
 
         job = CoroutineScope(Dispatchers.Main).launch {
-            val dialog = ProgressDialog.createProgressDialog(activity as Activity)
-            val bitmapList = ImageManager.imageResize(newList, activity as Activity)
+            val dialog = ProgressDialog.createProgressDialog(activity)
+            val bitmapList = ImageManager.imageResize(newList, activity)
             dialog.dismiss()
             adapter.updateAdapter(bitmapList, needClear)
             if (adapter.mainArray.size > 2) addImageItem?.isVisible = false
@@ -105,7 +101,7 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
 
             addImageItem?.setOnMenuItemClickListener {
               val imageCount = ImagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
-                ImagePicker.launcher(activity as EditAdsAct, imageCount)
+                ImagePicker.getMultiImages(activity as EditAdsAct, imageCount)
                 true
             }
 
@@ -113,7 +109,7 @@ class ImageListFrag(private val fragCloseInterface: FragmentCloseInterface,priva
     }
 
     fun updateAdapter(newList: ArrayList<Uri>) {
-        resizeSelectedImages(newList, false)
+        resizeSelectedImages(newList, false, activity as Activity)
     }
 
     fun setSingleImage(uri: Uri, pos: Int) {
