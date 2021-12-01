@@ -42,9 +42,20 @@ object ImagePicker {
             when (result.status) {
                 PixEventCallback.Status.SUCCESS -> {
                     getMultiSelectImages(edAct, result.data)
-                    closePixFrag(edAct)
                 }
-                  //  PixEventCallback.Status.BACK_PRESSED -> // back pressed called
+            }
+        }
+    }
+
+    fun addImages(edAct: EditAdsAct, imageCounter: Int) {
+        val f = edAct.chooseImageFrag
+        edAct.addPixToActivity(R.id.place_holder, getOptions(imageCounter)) { result ->
+            when (result.status) {
+                PixEventCallback.Status.SUCCESS -> {
+                    edAct.chooseImageFrag = f
+                    openChooseImageFrag(edAct, f!!)
+                    edAct.chooseImageFrag?.updateAdapter(result.data as ArrayList<Uri>, edAct)
+                }
             }
         }
     }
@@ -58,7 +69,6 @@ object ImagePicker {
                     openChooseImageFrag(edAct, f!!)
                     singleImage(edAct, result.data[0])
                 }
-                //  PixEventCallback.Status.BACK_PRESSED -> // back pressed called
             }
         }
     }
@@ -78,8 +88,7 @@ object ImagePicker {
     fun getMultiSelectImages(edAct: EditAdsAct, uris: List<Uri>) {
         if (uris.size > 1 && edAct.chooseImageFrag == null) {
             edAct.openChooseImageFrag(uris as ArrayList<Uri>)
-        } else if (edAct.chooseImageFrag != null) {
-            edAct.chooseImageFrag?.updateAdapter(uris as ArrayList<Uri>)
+
         } else if (uris.size == 1 && edAct.chooseImageFrag == null) {
             CoroutineScope(Dispatchers.Main).launch {
                 edAct.rootElement.pBarLoad.visibility = View.VISIBLE
@@ -87,6 +96,7 @@ object ImagePicker {
                     ImageManager.imageResize(uris as ArrayList<Uri>, edAct) as ArrayList<Bitmap>
                 edAct.rootElement.pBarLoad.visibility = View.GONE
                 edAct.imageAdapter.update(bitmapArray)
+                closePixFrag(edAct)
             }
         }
     }
