@@ -139,6 +139,8 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 edPrice.text.toString(),
                 edDescription.text.toString(),
                 "empty",
+                "empty",
+                "empty",
                 dbManager.db.push().key, "0",
                 dbManager.auth.uid)
         }
