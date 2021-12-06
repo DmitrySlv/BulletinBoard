@@ -60,5 +60,13 @@
     <string name="publish">Опубликовать</string>
     <!-- Ad List Item -->
     <string name="price_desc">Цена:</string>
+    <!-- Description Activity -->
+    <string name="desc_act_price">Цена:</string>
+    <string name="desc_act_phone">Телефон:</string>
+    <string name="desc_act_email">Email:</string>
+    <string name="desc_act_country">Страна:</string>
+    <string name="desc_act_city">Город:</string>
+    <string name="desc_act_index">Индекс:</string>
+    <string name="desc_act_with_send">С отправкой:</string>
 
 </resources>
