@@ -69,7 +69,7 @@ class DescriptionActivity : AppCompatActivity() {
     }
 
     private fun isWithSend(withSend: Boolean): String {
-        return if (withSend) getString(R.string.desc_act_with_send)
+        return if (withSend) getString(R.string.desc_act_with_send_boolean)
         else getString(R.string.desc_act_without_send_boolean)
     }
 
