@@ -7,10 +7,10 @@ import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
+import com.ds_create.bulletinboard.adapters.ImageAdapter
+import com.ds_create.bulletinboard.model.Ad
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.InputStream
 
@@ -70,15 +70,21 @@ object ImageManager {
 
     }
 
-    suspend fun getBitmapFromUris(uris: List<String?>): List<Bitmap> = withContext(Dispatchers.IO) {
+   private suspend fun getBitmapFromUris(uris: List<String?>): List<Bitmap> = withContext(Dispatchers.IO) {
         val bitmapList = ArrayList<Bitmap>()
         for (i in uris.indices) {
             kotlin.runCatching {
                 bitmapList.add(Picasso.get().load(uris[i]).get())
             }
         }
-
         return@withContext bitmapList
+    }
 
+    fun fillImageArray(ad: Ad, adapter: ImageAdapter) {
+        val listUris = listOf(ad.mainImage, ad.image2, ad.image3)
+        CoroutineScope(Dispatchers.Main).launch {
+            val bitmapList = getBitmapFromUris(listUris)
+            adapter.update(bitmapList as ArrayList<Bitmap>)
+        }
     }
 }

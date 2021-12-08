@@ -66,11 +66,6 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
             ibDeleteAd.setOnClickListener{
                 act.onDeleteItem(ad)
             }
-            itemView.setOnClickListener {
-                val i = Intent(binding.root.context, DescriptionActivity::class.java)
-                i.putExtra(DescriptionActivity.AD, ad)
-                binding.root.context.startActivity(i)
-            }
         }
 
         private fun isFav(ad: Ad) {

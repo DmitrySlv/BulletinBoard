@@ -13,6 +13,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ds_create.bulletinboard.accounthelper.AccountHelper
+import com.ds_create.bulletinboard.act.DescriptionActivity
 import com.ds_create.bulletinboard.act.EditAdsAct
 import com.ds_create.bulletinboard.adapters.AdsRcAdapter
 import com.ds_create.bulletinboard.databinding.ActivityMainBinding
@@ -190,6 +191,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onAddViewed(ad: Ad) {
         firebaseViewModel.adViewed(ad)
+        val i = Intent(this, DescriptionActivity::class.java)
+        i.putExtra(DescriptionActivity.AD, ad)
+        startActivity(i)
     }
 
     override fun onFavClicked(ad: Ad) {
