@@ -18,6 +18,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ds_create.bulletinboard.accounthelper.AccountHelper
 import com.ds_create.bulletinboard.act.DescriptionActivity
 import com.ds_create.bulletinboard.act.EditAdsAct
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initViewModel()
         firebaseViewModel.loadAllAds()
         bottomMenuOnClick()
+        scrollListener()
     }
 
     override fun onResume() {
@@ -191,11 +193,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
        }
     }
 
-    companion object {
-        const val EDIT_STATE = "edit_state"
-        const val ADS_DATA = "ads_data"
-    }
-
     override fun onDeleteItem(ad: Ad) {
         firebaseViewModel.deleteItem(ad)
     }
@@ -224,5 +221,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         spanAccCat.setSpan(ForegroundColorSpan(ContextCompat.getColor(this@MainActivity,
         R.color.color_red)), 0, accCat.title.length, 0)
         accCat.title = spanAccCat
+    }
+
+    private fun scrollListener() = with(binding.mainContent) {
+        rcView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recView, newState)
+                if (!recView.canScrollVertically(SCROLL_DOWN)
+                    && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    Log.d("MyLog", "Не скролится вниз")
+                }
+            }
+        })
+    }
+
+    companion object {
+        const val EDIT_STATE = "edit_state"
+        const val ADS_DATA = "ads_data"
+        const val SCROLL_DOWN = 1
     }
 }
