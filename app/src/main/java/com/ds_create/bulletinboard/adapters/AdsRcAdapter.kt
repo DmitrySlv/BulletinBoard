@@ -33,10 +33,14 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
     }
 
     fun updateAdapter(newList: List<Ad>) {
-        val diffResult = DiffUtil.calculateDiff(DiffUtilHelper(adArray, newList))
+        val tempArray = ArrayList<Ad>()
+        tempArray.addAll(adArray)
+        tempArray.addAll(newList)
+
+        val diffResult = DiffUtil.calculateDiff(DiffUtilHelper(adArray, tempArray))
         diffResult.dispatchUpdatesTo(this)
         adArray.clear()
-        adArray.addAll(newList)
+        adArray.addAll(tempArray)
     }
 
     class AdHolder(val binding: AdListItemBinding, val act: MainActivity) :
