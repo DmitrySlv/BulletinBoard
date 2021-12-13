@@ -148,16 +148,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Toast.makeText(this, "Pressed id_my_ads", Toast.LENGTH_LONG).show()
             }
             R.id.id_car -> {
-                Toast.makeText(this, "Pressed id_car", Toast.LENGTH_LONG).show()
+               getAdsFromCat(getString(R.string.add_car))
             }
             R.id.id_pc -> {
-                Toast.makeText(this, "Pressed id_pc", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.add_pc))
             }
             R.id.id_smart -> {
-                Toast.makeText(this, "Pressed id_smart", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.add_smartphone))
             }
             R.id.id_dm -> {
-                Toast.makeText(this, "Pressed id_dm", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.add_dm))
             }
             R.id.id_sign_up -> {
                 dialogHelper.createSignDialog(DialogConst.SIGN_UP_STATE)
@@ -177,6 +177,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun getAdsFromCat(cat: String) {
+        val catTime = "${cat}_0"
+        firebaseViewModel.loadAllAdsFromCat(catTime)
     }
 
     fun uiUpdate(user:FirebaseUser?) {
@@ -236,11 +241,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         clearUpdate = false
                     val adsList = firebaseViewModel.liveAdsData.value!!
                     if (adsList.isNotEmpty()) {
-                        adsList[adsList.size - 1].let { firebaseViewModel.loadAllAds(it.time) }
+                        getAdsFromCat(adsList)
                     }
                 }
             }
         })
+    }
+
+    private fun getAdsFromCat(adsList: ArrayList<Ad>) {
+        adsList[adsList.size - 1].let {
+            if (it.category == getString(R.string.def)) {
+                firebaseViewModel.loadAllAds(it.time)
+            } else {
+                val catTime = "${it.category}_${it.time}"
+                    firebaseViewModel.loadAllAdsFromCat(catTime)
+            }
+        }
     }
 
     companion object {
