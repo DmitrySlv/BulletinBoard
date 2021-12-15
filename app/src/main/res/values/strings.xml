@@ -70,5 +70,6 @@
     <string name="desc_act_with_send">С отправкой:</string>
     <string name="desc_act_with_send_boolean">Да</string>
     <string name="desc_act_without_send_boolean">Нет</string>
-
+    <!-- Filter Activity -->
+    <string name="apply_filter">Применить фильтр</string>
 </resources>
