@@ -23,7 +23,6 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
-
     </style>
 
     <style name="ActionBarCustom">
@@ -35,5 +34,13 @@
     <style name="ToolbarMainStyle" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorControlNormal">@color/green_main</item>
         <item name="fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="AppTheme.Filter" parent="Theme.MaterialComponents.Light">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 </resources>

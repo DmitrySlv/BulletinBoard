@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/id_new_ads"
-        android:title="New ad"
-        android:icon="@drawable/ic_new_ads"
+        android:id="@+id/id_filter"
+        android:title="filter"
+        android:icon="@drawable/ic_filter"
         app:showAsAction="ifRoom"
         />
 </menu>
