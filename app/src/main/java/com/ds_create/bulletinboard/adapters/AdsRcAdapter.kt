@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ds_create.bulletinboard.MainActivity
 import com.ds_create.bulletinboard.R
+import com.ds_create.bulletinboard.act.DescriptionActivity
 import com.ds_create.bulletinboard.act.EditAdsAct
 import com.ds_create.bulletinboard.model.Ad
 import com.ds_create.bulletinboard.databinding.AdListItemBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Picasso
 
 class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
 
@@ -31,6 +33,17 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
     }
 
     fun updateAdapter(newList: List<Ad>) {
+        val tempArray = ArrayList<Ad>()
+        tempArray.addAll(adArray)
+        tempArray.addAll(newList)
+
+        val diffResult = DiffUtil.calculateDiff(DiffUtilHelper(adArray, tempArray))
+        diffResult.dispatchUpdatesTo(this)
+        adArray.clear()
+        adArray.addAll(tempArray)
+    }
+
+    fun updateWithClear(newList: List<Ad>) {
         val diffResult = DiffUtil.calculateDiff(DiffUtilHelper(adArray, newList))
         diffResult.dispatchUpdatesTo(this)
         adArray.clear()
@@ -46,12 +59,14 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
             tvTitle.text = ad.title
             tvViewCounter.text = ad.viewsCounter
             tvFavCounter.text = ad.favCounter
-            if (ad.isFav) {
-                ibFav.setImageResource(R.drawable.ic_fav_pressed)
-            } else {
-                ibFav.setImageResource(R.drawable.ic_fav_normal)
-            }
+            Picasso.get().load(ad.mainImage).into(mainImage)
+
+            isFav(ad)
             showEditPanel(isOwner(ad))
+            mainOnClick(ad)
+        }
+
+        private fun mainOnClick(ad: Ad) = with(binding) {
             ibFav.setOnClickListener {
                 if (act.mAuth.currentUser?.isAnonymous == false) act.onFavClicked(ad)
             }
@@ -61,6 +76,14 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
             ibEditAd.setOnClickListener(onClickEdit(ad))
             ibDeleteAd.setOnClickListener{
                 act.onDeleteItem(ad)
+            }
+        }
+
+        private fun isFav(ad: Ad) {
+            if (ad.isFav) {
+               binding.ibFav.setImageResource(R.drawable.ic_fav_pressed)
+            } else {
+                binding.ibFav.setImageResource(R.drawable.ic_fav_normal)
             }
         }
 

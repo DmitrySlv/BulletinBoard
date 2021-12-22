@@ -1,15 +1,18 @@
 package com.ds_create.bulletinboard.utils
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
+import com.ds_create.bulletinboard.adapters.ImageAdapter
+import com.ds_create.bulletinboard.model.Ad
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
+import java.io.InputStream
 
 object ImageManager {
 
@@ -17,36 +20,16 @@ object ImageManager {
     private const val WIDTH = 0
     private const val HEIGHT = 1
 
-    fun getImageSize(uri: String): List<Int> {
-
+    fun getImageSize(uri: Uri, act: Activity): List<Int> {
+        val inStream = act.contentResolver.openInputStream(uri)
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
         }
-     BitmapFactory.decodeFile(uri, options)
-
-        return if (imageRotation(uri) == 90)
-            listOf(options.outHeight, options.outWidth)
-        else
-            listOf(options.outWidth, options.outHeight)
-    }
-
-  private fun imageRotation(uri: String) : Int {
-
-        val rotation: Int
-        val imageFile = File(uri)
-        val exif = ExifInterface(imageFile.absolutePath)
-        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-        rotation = if (orientation == ExifInterface.ORIENTATION_ROTATE_90 || orientation == ExifInterface.ORIENTATION_ROTATE_270){
-            90
-        } else {
-            0
-        }
-
-        return rotation
+     BitmapFactory.decodeStream(inStream, null, options)
+        return listOf(options.outWidth, options.outHeight)
     }
 
     fun chooseScaleType(im: ImageView, bitmap: Bitmap) {
-
         if (bitmap.width > bitmap.height) {
             im.scaleType = ImageView.ScaleType.CENTER_CROP
         } else {
@@ -54,50 +37,54 @@ object ImageManager {
         }
     }
 
-   suspend fun imageResize(uris: List<String>): List<Bitmap> = withContext(Dispatchers.IO) {
+   suspend fun imageResize(uris: List<Uri>, act: Activity): List<Bitmap> = withContext(Dispatchers.IO) {
         val tempList = ArrayList<List<Int>>()
         val bitmapList = ArrayList<Bitmap>()
 
         for (n in uris.indices) {
-
-            val size = getImageSize(uris[n])
-
+            val size = getImageSize(uris[n], act)
             val imageRatio = size[WIDTH].toFloat() / size[HEIGHT].toFloat()
-
             if (imageRatio > 1) {
-
                 if (size[WIDTH] > MAX_IMAGE_SIZE) {
-
                     tempList.add(listOf(MAX_IMAGE_SIZE, (MAX_IMAGE_SIZE / imageRatio).toInt()))
-
                 } else {
-
                     tempList.add(listOf(size[WIDTH], size[HEIGHT]))
                 }
-
             } else {
-
                 if (size[HEIGHT] > MAX_IMAGE_SIZE) {
-
                     tempList.add(listOf((MAX_IMAGE_SIZE * imageRatio).toInt(), MAX_IMAGE_SIZE))
-
                 } else {
-
                     tempList.add(listOf(size[WIDTH], size[HEIGHT]))
                 }
-
             }
-
         }
 
        for (i in uris.indices) {
 
            kotlin.runCatching {
-               bitmapList.add(Picasso.get().load(File(uris[i])).resize(tempList[i][WIDTH], tempList[i][HEIGHT]).get())
+               bitmapList.add(Picasso.get().load(uris[i]).resize(tempList[i][WIDTH], tempList[i][HEIGHT]).get())
            }
        }
 
        return@withContext bitmapList
 
+    }
+
+   private suspend fun getBitmapFromUris(uris: List<String?>): List<Bitmap> = withContext(Dispatchers.IO) {
+        val bitmapList = ArrayList<Bitmap>()
+        for (i in uris.indices) {
+            kotlin.runCatching {
+                bitmapList.add(Picasso.get().load(uris[i]).get())
+            }
+        }
+        return@withContext bitmapList
+    }
+
+    fun fillImageArray(ad: Ad, adapter: ImageAdapter) {
+        val listUris = listOf(ad.mainImage, ad.image2, ad.image3)
+        CoroutineScope(Dispatchers.Main).launch {
+            val bitmapList = getBitmapFromUris(listUris)
+            adapter.update(bitmapList as ArrayList<Bitmap>)
+        }
     }
 }

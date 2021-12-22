@@ -1,14 +1,13 @@
 package com.ds_create.bulletinboard.act
 
 
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
+import androidx.viewpager2.widget.ViewPager2
 import com.ds_create.bulletinboard.MainActivity
 import com.ds_create.bulletinboard.R
 import com.ds_create.bulletinboard.adapters.ImageAdapter
@@ -19,28 +18,30 @@ import com.ds_create.bulletinboard.dialogs.DialogSpinnerHelper
 import com.ds_create.bulletinboard.fragments.FragmentCloseInterface
 import com.ds_create.bulletinboard.fragments.ImageListFrag
 import com.ds_create.bulletinboard.utils.CityHelper
+import com.ds_create.bulletinboard.utils.ImageManager
 import com.ds_create.bulletinboard.utils.ImagePicker
-import com.fxn.utility.PermUtil
+import com.google.android.gms.tasks.OnCompleteListener
+import java.io.ByteArrayOutputStream
 
 class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
     var chooseImageFrag: ImageListFrag? = null
-    lateinit var rootElement: ActivityEditAdsBinding
+    lateinit var binding: ActivityEditAdsBinding
     private val dialog = DialogSpinnerHelper()
     lateinit var imageAdapter: ImageAdapter
     private val dbManager = DbManager()
     var editImagePos = 0
-    var launcherMultiSelectImage: ActivityResultLauncher<Intent>? = null
-    var launcherSingleSelectImage: ActivityResultLauncher<Intent>? = null
+    private var imageIndex = 0
     private var isEditState = false
     private var ad: Ad? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rootElement = ActivityEditAdsBinding.inflate(layoutInflater)
-        setContentView(rootElement.root)
+        binding = ActivityEditAdsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         init()
         checkEditState()
+        imageChangeCounter()
     }
 
     private fun checkEditState() {
@@ -57,7 +58,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         return intent.getBooleanExtra(MainActivity.EDIT_STATE, false)
     }
 
-    private fun fillViews(ad: Ad) = with(rootElement) {
+    private fun fillViews(ad: Ad) = with(binding) {
         tvCountry.text = ad.country
         tvCity.text = ad.city
         editTel.setText(ad.tel)
@@ -67,54 +68,29 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
         edTitle.setText(ad.title)
         edPrice.setText(ad.price)
         edDescription.setText(ad.description)
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS -> {
-
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                   // ImagePicker.getImages(this, 3, ImagePicker.REQUEST_CODE_GET_IMAGES)
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Approve permissions to open Pix ImagePicker",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                return
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        ImageManager.fillImageArray(ad, imageAdapter)
     }
 
 
     private fun init() {
         imageAdapter = ImageAdapter()
-        rootElement.vpImages.adapter = imageAdapter
-        launcherMultiSelectImage = ImagePicker.getLauncherForMultiSelectImages(this)
-        launcherSingleSelectImage = ImagePicker.getLauncherForSingleImage(this)
+        binding.vpImages.adapter = imageAdapter
     }
 
     //OnClicks
     fun onClickSelectCountry(view: View) {
         val listCountry = CityHelper.getAllCountries(this)
-        dialog.showSpinnerDialog(this, listCountry, rootElement.tvCountry)
-        if (rootElement.tvCity.text.toString() != getString(R.string.select_city)) {
-            rootElement.tvCity.text = getString(R.string.select_city)
+        dialog.showSpinnerDialog(this, listCountry, binding.tvCountry)
+        if (binding.tvCity.text.toString() != getString(R.string.select_city)) {
+            binding.tvCity.text = getString(R.string.select_city)
         }
     }
 
     fun onClickSelectCity(view: View) {
-        val selectedCountry = rootElement.tvCountry.text.toString()
+        val selectedCountry = binding.tvCountry.text.toString()
         if (selectedCountry != getString(R.string.select_country)) {
             val listCity = CityHelper.getAllCities(selectedCountry, this)
-            dialog.showSpinnerDialog(this, listCity, rootElement.tvCity)
+            dialog.showSpinnerDialog(this, listCity, binding.tvCity)
         } else {
             Toast.makeText(this, getString(R.string.no_country_selected), Toast.LENGTH_LONG).show()
         }
@@ -122,13 +98,13 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
     fun onClickSelectCat(view: View) {
         val listCity = resources.getStringArray(R.array.category).toMutableList() as ArrayList
-        dialog.showSpinnerDialog(this, listCity, rootElement.tvCat)
+        dialog.showSpinnerDialog(this, listCity, binding.tvCat)
     }
 
     fun onClickGetImages(view: View) {
 
         if (imageAdapter.mainArray.size == 0) {
-            ImagePicker.launcher(this, launcherMultiSelectImage, 3)
+            ImagePicker.getMultiImages(this,  3)
         } else {
             openChooseImageFrag(null)
             chooseImageFrag?.updateAdapterFromEdit(imageAdapter.mainArray)
@@ -136,11 +112,12 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
     }
 
     fun onClickPublish(view: View) {
-        val adTemp = fillAd()
+        ad = fillAd()
         if (isEditState) {
-            dbManager.publishAd(adTemp.copy(key = ad?.key), onPublishFinish())
+            ad?.copy(key = ad?.key)?.let { dbManager.publishAd(it, onPublishFinish()) }
         } else {
-            dbManager.publishAd(adTemp, onPublishFinish())
+           // dbManager.publishAd(adTemp, onPublishFinish())
+            uploadImages()
         }
     }
 
@@ -154,7 +131,7 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
 
     private fun fillAd(): Ad {
         val ad: Ad
-        rootElement.apply {
+        binding.apply {
             ad = Ad(
                 tvCountry.text.toString(),
                 tvCity.text.toString(),
@@ -164,23 +141,81 @@ class EditAdsAct : AppCompatActivity(), FragmentCloseInterface {
                 tvCat.text.toString(),
                 edTitle.text.toString(),
                 edPrice.text.toString(),
-                edDescription.text.toString(), dbManager.db.push().key, "0", dbManager.auth.uid)
+                edDescription.text.toString(),
+                editEmail.text.toString(),
+                "empty",
+                "empty",
+                "empty",
+                dbManager.db.push().key, "0",
+                dbManager.auth.uid, System.currentTimeMillis().toString())
         }
         return ad
     }
 
     override fun onFragClose(list: ArrayList<Bitmap>) {
-        rootElement.scrollViewMain.visibility = View.VISIBLE
+        binding.scrollViewMain.visibility = View.VISIBLE
         imageAdapter.update(list)
         chooseImageFrag = null
     }
 
-    fun openChooseImageFrag(newList: ArrayList<String>?) {
-
-        chooseImageFrag = ImageListFrag(this, newList)
-        rootElement.scrollViewMain.visibility = View.GONE
+    fun openChooseImageFrag(newList: ArrayList<Uri>?) {
+        chooseImageFrag = ImageListFrag(this)
+        if (newList != null) chooseImageFrag?.resizeSelectedImages(newList, true, this)
+        binding.scrollViewMain.visibility = View.GONE
         val fm = supportFragmentManager.beginTransaction()
         fm.replace(R.id.place_holder, chooseImageFrag!!)
         fm.commit()
+    }
+
+    private fun uploadImages() {
+        if (imageAdapter.mainArray.size == imageIndex) {
+            dbManager.publishAd(ad!!, onPublishFinish())
+            return
+        }
+        val byteArray = prepareImageByteArray(imageAdapter.mainArray[imageIndex])
+        uploadImage(byteArray) {
+           // dbManager.publishAd(ad!!, onPublishFinish())
+            nextImage(it.result.toString())
+        }
+    }
+
+    private fun nextImage(uri: String) {
+        setImageUriToAd(uri)
+        imageIndex++
+        uploadImages()
+    }
+
+    private fun setImageUriToAd(uri: String) {
+        when(imageIndex) {
+            0 -> ad = ad?.copy(mainImage = uri)
+            1 -> ad = ad?.copy(image2 = uri)
+            2 -> ad = ad?.copy(image3 = uri)
+        }
+    }
+
+    private fun prepareImageByteArray(bitmap: Bitmap): ByteArray {
+        val outStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outStream)
+        return outStream.toByteArray()
+    }
+
+    private fun uploadImage(byteArray: ByteArray, listener: OnCompleteListener<Uri>) {
+        val imStorageRef = dbManager.dbStorage
+            .child(dbManager.auth.uid!!)
+            .child("image_${System.currentTimeMillis()}")
+        val upTask = imStorageRef.putBytes(byteArray)
+        upTask.continueWithTask{ task ->
+            imStorageRef.downloadUrl
+        }.addOnCompleteListener(listener)
+    }
+
+    private fun imageChangeCounter() {
+        binding.vpImages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                val imageCounter = "${position + 1}/${binding.vpImages.adapter?.itemCount}"
+                binding.tvImageCounter.text = imageCounter
+            }
+        })
     }
 }
